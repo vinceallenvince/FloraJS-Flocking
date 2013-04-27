@@ -23,10 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* Version: 1.0.0 */
-/* Build time: April 27, 2013 12:48:16 */
+/* Build time: April 27, 2013 01:02:01 */
 
 /*global Flora, document */
-
 Flora.Mantle.System.create(function() {
 
   var getRandomNumber = Flora.Utils.getRandomNumber,
@@ -49,7 +48,7 @@ Flora.Mantle.System.create(function() {
     flowField: flowField,
     wrapEdges: true,
     mass: getRandomNumber(100, 300),
-    opacity: 0,
+    visibility: 'hidden',
     beforeStep: function() {
       return function() {
         if (getRandomNumber(0, 1000) === 1000) {

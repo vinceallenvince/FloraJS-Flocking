@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* Version: 1.0.0 */
-/* Build time: April 27, 2013 12:48:16 */
+/* Build time: April 27, 2013 01:02:01 */
 
 /*global Flora, document */
 Flora.Mantle.System.create(function() {
@@ -48,7 +48,7 @@ Flora.Mantle.System.create(function() {
     flowField: flowField,
     wrapEdges: true,
     mass: getRandomNumber(100, 300),
-    opacity: 0,
+    visibility: 'hidden',
     beforeStep: function() {
       return function() {
         if (getRandomNumber(0, 1000) === 1000) {
@@ -59,82 +59,33 @@ Flora.Mantle.System.create(function() {
     }
   });
 
-  function getColorPalette() {
-    var temp_pl;
-    switch (getRandomNumber(1, 5)) {
-      case 1:
-        temp_pl = new Flora.ColorPalette('darkPurple');
-        temp_pl.addColor({
-          min: 1,
-          max: 24,
-          startColor: [73, 10, 61],
-          endColor: [111, 33, 96]
-        });
-        break;
-
-      case 2:
-        temp_pl = new Flora.ColorPalette('pink');
-        temp_pl.addColor({
-          min: 1,
-          max: 24,
-          startColor: [189, 21, 80],
-          endColor: [236, 67, 126]
-        });
-        break;
-
-      case 3:
-        temp_pl = new Flora.ColorPalette('orange');
-        temp_pl.addColor({
-          min: 1,
-          max: 24,
-          startColor: [233, 127, 2],
-          endColor: [255, 179, 89]
-        });
-        break;
-
-      case 4:
-        temp_pl = new Flora.ColorPalette('yellow');
-        temp_pl.addColor({
-          min: 1,
-          max: 24,
-          startColor: [248, 202, 0],
-          endColor: [255, 226, 99]
-        });
-        break;
-
-      case 5:
-        temp_pl = new Flora.ColorPalette('green');
-        temp_pl.addColor({
-          min: 1,
-          max: 24,
-          startColor: [138, 155, 15],
-          endColor: [188, 205, 63]
-        });
-        break;
-    }
-    return temp_pl;
+  var pl = new Flora.ColorPalette();
+  if (getRandomNumber(1, 2) === 1) {
+    pl.addColor({
+      min: 1,
+      max: 24,
+      startColor: [200, 125, 0],
+      endColor: [255, 150, 255]
+    });
+  } else {
+    pl.addColor({
+      min: 1,
+      max: 24,
+      startColor: [0, 175, 255],
+      endColor: [0, 70, 150]
+    });
   }
-  var pl = getColorPalette();
 
   var wings = [];
 
-  var beforeStepStick = function() {
+  var beforeStep = function() {
     return function() {
-      this.angle = 90 + Flora.Utils.radiansToDegrees(Math.atan2(this.velocity.y, this.velocity.x));
 
-      if (this.opacity < 1) {
-        this.opacity += 0.01;
-      }
-    };
-  };
-
-  var beforeStepPropeller = function() {
-    return function() {
       this.flapAngle += Flora.Utils.map(this.velocity.mag(),
           this.minSpeed, this.maxSpeed, 1, 50);
 
       this.angle = Flora.Utils.radiansToDegrees(Math.atan2(this.velocity.y, this.velocity.x)) +
-          (this.index ? this.flapAngle : -this.flapAngle);
+           (this.index ? this.flapAngle : -this.flapAngle);
 
       if (this.opacity < 1) {
         this.opacity += 0.01;
@@ -142,35 +93,36 @@ Flora.Mantle.System.create(function() {
     };
   };
 
-  for (var i = 0; i < 25; i++) {
+  for (var i = 0; i < 40; i++) {
 
-    var wingSize = getRandomNumber(8, 64),
-        mass = getRandomNumber(100, 300);
+    var wingSize = getRandomNumber(4, 32),
+        color = pl.getColor(),
+        mass = getRandomNumber(100, 300),
+        location = new Flora.Vector(world.bounds[1] / 2 + getRandomNumber(-50, 50),
+          world.bounds[2] / 2 + getRandomNumber(-50, 50));
 
-    for (var j = 0; j < 3; j++) {
+    for (var j = 0; j < 2; j++) {
       wings.push(this.add('Agent', {
-        parent: j ? wings[wings.length - j] : null,
-        location: j ? new Flora.Vector() : new Flora.Vector(world.bounds[1] / 2 + getRandomNumber(-50, 50),
-          world.bounds[2] / 2 + getRandomNumber(-50, 50)),
+        parent: j ? wings[wings.length - 1] : null,
+        location: location,
         seekTarget: target,
-        offsetAngle: 0,
-        offsetDistance: j ? (j === 1 ? wingSize / 20: -wingSize / 20) : null,
-        className: 'roll',
+        offsetDistance: 0,
+        className: 'wing',
         pointToDirection: false,
-        maxSteeringForce: 1000,
         wrapEdges: true,
-        flocking: j ? false : true,
+        flocking: j ? true : false,
         separateStrength: 0.4,
         alignStrength: 0.1,
         cohesionStrength: 0.3,
-        width: j ? wingSize : wingSize,
-        height: wingSize < 32 ? 1 : 2,
-        color: j ? pl.getColor() : [255, 255, 255],
-        opacity: 1,
+        width: wingSize,
+        height: wingSize < 12 ? 1 : 2,
+        border: 'none',
+        color: color,
+        opacity: 0,
         flapAngle: 0,
         mass: mass,
         index: j,
-        beforeStep: j ? beforeStepStick : beforeStepPropeller
+        beforeStep: beforeStep
       }));
     }
   }

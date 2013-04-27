@@ -21,7 +21,7 @@ Flora.Mantle.System.create(function() {
     flowField: flowField,
     wrapEdges: true,
     mass: getRandomNumber(100, 300),
-    opacity: 0,
+    visibility: 'hidden',
     beforeStep: function() {
       return function() {
         if (getRandomNumber(0, 1000) === 1000) {
