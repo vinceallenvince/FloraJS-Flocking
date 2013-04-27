@@ -3,10 +3,7 @@
   <target name="build.dev" depends="
       clean,
       init,
-      concatenateJS,
-      concatenateCSS,
-      bakeDev,
-      deployToDev">
+      validateJS">
   </target>
 
   <target name="build.release" depends="
@@ -41,10 +38,10 @@
     </condition>
   </target>
 
-  <!-- Delete all files not inside /build/backup -->
+  <!-- Delete all files in build -->
   <target name="cleanBuild" depends="checkBuild" if="cleandir">
     <delete>
-      <fileset dir="${build.dir}" includes="**/*.js" excludes="backup/**/*.js">
+      <fileset dir="${build.dir}" includes="**/*.js">
       </fileset>
     </delete>
   </target>
@@ -57,14 +54,6 @@
   <!-- Create folders for build, backup, and doc files. -->
   <target name="init">
     <mkdir dir="${build.dir}"/>
-    <mkdir dir="${build.dir}/backup"/>
-    <mkdir dir="${cssBuild.dir}/backup"/>
-    <mkdir dir="${jsdoc.output}"/>
-    <script language="javascript">
-      var buildName = project.getProperty("buildName")
-      project.setProperty("buildNameLower", buildName.toLowerCase());
-    </script>
-    <echo message="${buildNameLower}"/>
   </target>
 
   <!-- Validate via jshint -->
