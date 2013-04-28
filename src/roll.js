@@ -1,10 +1,10 @@
 /*global Flora, document */
-Flora.Mantle.System.create(function() {
+Flora.Burner.System.create(function() {
 
   var getRandomNumber = Flora.Utils.getRandomNumber,
-      world = Flora.Mantle.System.allWorlds()[0];
+      world = Flora.Burner.System.allWorlds()[0];
 
-  Flora.Mantle.World.update({
+  Flora.Burner.World.update({
     gravity: new Flora.Vector(),
     c: 0
   });
@@ -153,18 +153,18 @@ Flora.Mantle.System.create(function() {
 
   Flora.Utils.addEvent(document, 'mousedown', function() {
     mousedown = true;
-    Flora.Mantle.System.updateElementPropsByName('Agent', {
+    Flora.Burner.System.updateElementPropsByName('Agent', {
       seekTarget: {
-        location: new Flora.Vector(Flora.Mantle.System.mouse.location.x, Flora.Mantle.System.mouse.location.y)
+        location: new Flora.Vector(Flora.Burner.System.mouse.location.x, Flora.Burner.System.mouse.location.y)
       }
     });
   });
 
   Flora.Utils.addEvent(document, 'mousemove', function() {
     if (mousedown) {
-      Flora.Mantle.System.updateElementPropsByName('Agent', {
+      Flora.Burner.System.updateElementPropsByName('Agent', {
         seekTarget: {
-          location: new Flora.Vector(Flora.Mantle.System.mouse.location.x, Flora.Mantle.System.mouse.location.y)
+          location: new Flora.Vector(Flora.Burner.System.mouse.location.x, Flora.Burner.System.mouse.location.y)
         }
       });
     }
@@ -172,7 +172,7 @@ Flora.Mantle.System.create(function() {
 
   Flora.Utils.addEvent(document, 'mouseup', function() {
     mousedown = false;
-    Flora.Mantle.System.updateElementPropsByName('Agent', {
+    Flora.Burner.System.updateElementPropsByName('Agent', {
       seekTarget: target
     });
   });

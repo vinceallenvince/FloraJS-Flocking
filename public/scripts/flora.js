@@ -23,18 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* Version: 1.0.0 */
-/* Build time: April 27, 2013 04:29:07 */
+/* Build time: April 28, 2013 12:50:06 */
 /** @namespace */
 var Flora = {}, exports = Flora;
 
 (function(exports) {
 'use strict';
 
-// create Mantle namespace
-exports.Mantle = {};
+// create Burner namespace
+exports.Burner = {};
 
 // pass in the namespace and parent object
-new Mantle(exports.Mantle, exports);
+new Burner(exports.Burner, exports);
 /*global exports */
 var config = {
   borderStyles: [
@@ -473,7 +473,7 @@ Utils.mouseIsInsideWorld = function(world) {
 
   'use strict';
 
-  var mouse = exports.Mantle.System.mouse,
+  var mouse = exports.Burner.System.mouse,
       x = mouse.location.x,
       y = mouse.location.y,
       left = world.el.offsetLeft,
@@ -1455,7 +1455,7 @@ function InputMenu(opt_options) {
   this.borderColor = options.borderColor || [204, 204, 204];
   this.colorMode = options.colorMode || 'rgb';
 
-  if (exports.Mantle.System.supportedFeatures.touch) {
+  if (exports.Burner.System.supportedFeatures.touch) {
     this.text =  exports.config.touchMap.stats + '-finger tap = stats | ' +
         exports.config.touchMap.pause + '-finger tap = pause | ' +
         exports.config.touchMap.reset + '-finger tap = reset';
@@ -1492,7 +1492,7 @@ function InputMenu(opt_options) {
     document.getElementById('inputMenu').parentNode.removeChild(document.getElementById('inputMenu'));
   }
 
-  if (exports.Mantle.System.supportedFeatures.touch) {
+  if (exports.Burner.System.supportedFeatures.touch) {
     exports.Utils.addEvent(this._el, 'touchstart', function() {
       me.destroy();
     });
@@ -1527,7 +1527,7 @@ exports.InputMenu = InputMenu;
  * Creates a new Mover. All Flora elements extend Mover.
  *
  * @constructor
- * @extends Mantle.Element
+ * @extends Burner.Element
  *
  * @param {Object} [opt_options] options.
  * @param {number} [opt_options.width = 10] Width
@@ -1561,10 +1561,10 @@ exports.InputMenu = InputMenu;
  */
 function Mover(opt_options) {
 
-  var myDiv, options, utils = exports.Mantle.Utils;
+  var myDiv, options, utils = exports.Burner.Utils;
 
   opt_options.name = this.name;
-  exports.Mantle.Element.call(this, opt_options);
+  exports.Burner.Element.call(this, opt_options);
 
   options = opt_options || {};
 
@@ -1706,7 +1706,7 @@ function Mover(opt_options) {
     exports.Utils.addEvent(this._el, 'mouseout', mouseout);
   }
 }
-exports.Mantle.Utils.extend(Mover, exports.Mantle.Element);
+exports.Burner.Utils.extend(Mover, exports.Burner.Element);
 
 Mover.prototype.name = 'Mover';
 
@@ -1793,7 +1793,7 @@ Mover.prototype.mouseout = function(e, obj) {
 
   'use strict';
 
-  var me = obj, mouse = exports.Mantle.System.mouse,
+  var me = obj, mouse = exports.Burner.System.mouse,
       x, y;
 
   if (obj.isPressed) {
@@ -2201,7 +2201,7 @@ Mover.prototype.draw = function() {
 Mover._getCSSText = function(props) {
 
   var color, position, borderRadius, borderWidth, borderStyle, borderColor,
-      system = exports.Mantle.System, utils = exports.Mantle.Utils;
+      system = exports.Burner.System, utils = exports.Burner.Utils;
 
   if (system.supportedFeatures.csstransforms3d) {
     position = [
@@ -2362,10 +2362,10 @@ Agent.prototype.name = 'Agent';
 Agent.prototype.applyForces = function() {
 
   var i, max, sensorActivated, dir, sensor, r, theta, x, y,
-      liquids = exports.Mantle.System._Caches.Liquid,
-      attractors = exports.Mantle.System._Caches.Attractor,
-      repellers = exports.Mantle.System._Caches.Repeller,
-      heat = exports.Mantle.System._Caches.Heat;
+      liquids = exports.Burner.System._Caches.Liquid,
+      attractors = exports.Burner.System._Caches.Attractor,
+      repellers = exports.Burner.System._Caches.Repeller,
+      heat = exports.Burner.System._Caches.Heat;
 
   if (liquids && liquids.list.length > 0) { // liquid
     for (i = 0, max = liquids.list.length; i < max; i += 1) {
@@ -2434,8 +2434,8 @@ Agent.prototype.applyForces = function() {
 
   if (this.followMouse) { // follow mouse
     var t = {
-      location: new exports.Vector(exports.Mantle.System.mouse.location.x,
-          exports.Mantle.System.mouse.location.y)
+      location: new exports.Vector(exports.Burner.System.mouse.location.x,
+          exports.Burner.System.mouse.location.y)
     };
     this.applyForce(this._seek(t));
   }
@@ -2468,7 +2468,7 @@ Agent.prototype.applyForces = function() {
   }
 
   if (this.flocking) {
-    this.flock(exports.Mantle.System.getAllElementsByName('Agent'));
+    this.flock(exports.Burner.System.getAllElementsByName('Agent'));
   }
 
   return this.acceleration;
@@ -2819,12 +2819,12 @@ Sensor.prototype.step = function() {
 
   var check = false, i, max;
 
-  var heat = exports.Mantle.System._Caches.Heat || {list: []},
-      cold = exports.Mantle.System._Caches.Cold || {list: []},
-      predators = exports.Mantle.System._Caches.Predators || {list: []},
-      lights = exports.Mantle.System._Caches.Light || {list: []},
-      oxygen = exports.Mantle.System._Caches.Oxygen || {list: []},
-      food = exports.Mantle.System._Caches.Food || {list: []};
+  var heat = exports.Burner.System._Caches.Heat || {list: []},
+      cold = exports.Burner.System._Caches.Cold || {list: []},
+      predators = exports.Burner.System._Caches.Predators || {list: []},
+      lights = exports.Burner.System._Caches.Light || {list: []},
+      oxygen = exports.Burner.System._Caches.Oxygen || {list: []},
+      food = exports.Burner.System._Caches.Food || {list: []};
 
   // what if cache does not exist?
 
@@ -3053,7 +3053,7 @@ function Liquid(opt_options) {
   this.borderColor = options.borderColor || [167, 219, 216];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Liquid, exports.Agent);
 
@@ -3098,7 +3098,7 @@ function Heat(opt_options) {
   this.borderColor = options.borderColor || [224, 178, 154];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Heat, exports.Agent);
 
@@ -3143,7 +3143,7 @@ function Cold(opt_options) {
   this.borderColor = options.borderColor || [0, 89, 102];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Cold, exports.Agent);
 
@@ -3188,7 +3188,7 @@ function Oxygen(opt_options) {
   this.borderColor = options.borderColor || [64, 255, 255];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Oxygen, exports.Agent);
 
@@ -3233,7 +3233,7 @@ function Light(opt_options) {
   this.borderColor = options.borderColor || [210, 210, 0];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Light, exports.Agent);
 
@@ -3387,7 +3387,7 @@ function Food(opt_options) {
   this.borderColor = options.borderColor || [115, 255, 0];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Food, exports.Agent);
 
@@ -3506,7 +3506,7 @@ Particle.prototype.step = function() {
   if (this.life < this.lifespan) {
     this.life += 1;
   } else if (this.lifespan !== -1) {
-    exports.Mantle.System.destroyElement(this);
+    exports.Burner.System.destroyElement(this);
   }
 
 };
@@ -3586,7 +3586,7 @@ function ParticleSystem(opt_options) {
     if (this.life < this.lifespan) {
       this.life += 1;
     } else if (this.lifespan !== -1) {
-      exports.Mantle.System.destroyElement(this);
+      exports.Burner.System.destroyElement(this);
       return;
     }
 
@@ -3610,7 +3610,7 @@ function ParticleSystem(opt_options) {
         this.particleOptions.velocity = new exports.Vector();
         this.particleOptions.location = ParticleSystem.getParticleLocation(location);
 
-        exports.Mantle.System.add('Particle', this.particleOptions);
+        exports.Burner.System.add('Particle', this.particleOptions);
       }
     }
   };
@@ -3796,7 +3796,7 @@ function Attractor(opt_options) {
   this.borderColor = options.borderColor || [224, 228, 204];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Attractor, exports.Agent);
 
@@ -3845,7 +3845,7 @@ function Repeller(opt_options) {
   this.borderColor = options.borderColor || [224, 228, 204];
   this.borderRadius = options.borderRadius || '100%';
 
-  exports.Mantle.PubSub.publish('UpdateCache', this);
+  exports.Burner.PubSub.publish('UpdateCache', this);
 }
 exports.Utils.extend(Repeller, exports.Agent);
 
@@ -3876,7 +3876,7 @@ function FlowField(opt_options) {
   this.field = options.field || null;
   this.createMarkers = options.createMarkers || false;
   // if a world is not passed, use the first world in the system
-  this.world = options.world || exports.Mantle.System.allWorlds()[0];
+  this.world = options.world || exports.Burner.System.allWorlds()[0];
 }
 
 FlowField.prototype.name = 'FlowField';
@@ -3994,16 +3994,16 @@ exports.FlowFieldMarker = FlowFieldMarker;
 exports.Utils.addEvent(document, 'keyup', function(e) {
 
   if (e.keyCode === config.keyMap.pause) {
-    exports.Mantle.PubSub.publish('pause');
+    exports.Burner.PubSub.publish('pause');
   }
   if (e.keyCode === config.keyMap.resetSystem) {
-    exports.Mantle.PubSub.publish('resetSystem');
+    exports.Burner.PubSub.publish('resetSystem');
   }
   if (e.keyCode === config.keyMap.destroySystem) {
-    exports.Mantle.PubSub.publish('destroySystem');
+    exports.Burner.PubSub.publish('destroySystem');
   }
   if (e.keyCode === config.keyMap.stats) {
-    exports.Mantle.PubSub.publish('stats');
+    exports.Burner.PubSub.publish('stats');
   }
 });
 }(exports));
