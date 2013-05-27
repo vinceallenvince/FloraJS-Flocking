@@ -1,13 +1,8 @@
-/*global Flora, document */
-Flora.Burner.System.create(function() {
+/*global Flora, Burner, document */
+Burner.System.init(function() {
 
   var getRandomNumber = Flora.Utils.getRandomNumber,
-      world = Flora.Burner.System.allWorlds()[0];
-
-  Flora.Burner.World.update({
-    gravity: new Flora.Vector(),
-    c: 0
-  });
+      world = Burner.System.firstWorld();
 
   var flowField = this.add('FlowField', {
     createMarkers: false,
@@ -19,16 +14,15 @@ Flora.Burner.System.create(function() {
 
   var target = this.add('Agent', {
     flowField: flowField,
-    wrapEdges: true,
+    wrapWorldEdges: true,
     mass: getRandomNumber(100, 300),
     visibility: 'hidden',
     beforeStep: function() {
-      return function() {
-        if (getRandomNumber(0, 1000) === 1000) {
-          this.location = new Flora.Vector(getRandomNumber(0, world.bounds[1]),
-              getRandomNumber(0, world.bounds[2]));
-        }
-      };
+
+      if (getRandomNumber(0, 1000) === 0) {
+        this.location = new Burner.Vector(getRandomNumber(0, world.width),
+            getRandomNumber(0, world.height));
+      }
     }
   });
 
@@ -92,30 +86,28 @@ Flora.Burner.System.create(function() {
   var wings = [];
 
   var beforeStepStick = function() {
-    return function() {
-      this.angle = 90 + Flora.Utils.radiansToDegrees(Math.atan2(this.velocity.y, this.velocity.x));
 
-      if (this.opacity < 1) {
-        this.opacity += 0.01;
-      }
-    };
+    this.angle = 90 + Flora.Utils.radiansToDegrees(Math.atan2(this.velocity.y, this.velocity.x));
+
+    if (this.opacity < 1) {
+      this.opacity += 0.01;
+    }
   };
 
   var beforeStepPropeller = function() {
-    return function() {
-      this.flapAngle += Flora.Utils.map(this.velocity.mag(),
-          this.minSpeed, this.maxSpeed, 1, 50);
 
-      this.angle = Flora.Utils.radiansToDegrees(Math.atan2(this.velocity.y, this.velocity.x)) +
-          (this.index ? this.flapAngle : -this.flapAngle);
+    this.flapAngle += Flora.Utils.map(this.velocity.mag(),
+        this.minSpeed, this.maxSpeed, 1, 50);
 
-      if (this.opacity < 1) {
-        this.opacity += 0.01;
-      }
-    };
+    this.angle = Flora.Utils.radiansToDegrees(Math.atan2(this.velocity.y, this.velocity.x)) +
+        (this.index ? this.flapAngle : -this.flapAngle);
+
+    if (this.opacity < 1) {
+      this.opacity += 0.01;
+    }
   };
 
-  for (var i = 0; i < 25; i++) {
+  for (var i = 0; i < 20; i++) {
 
     var wingSize = getRandomNumber(8, 64),
         mass = getRandomNumber(100, 300);
@@ -123,15 +115,14 @@ Flora.Burner.System.create(function() {
     for (var j = 0; j < 3; j++) {
       wings.push(this.add('Agent', {
         parent: j ? wings[wings.length - j] : null,
-        location: j ? new Flora.Vector() : new Flora.Vector(world.bounds[1] / 2 + getRandomNumber(-50, 50),
-          world.bounds[2] / 2 + getRandomNumber(-50, 50)),
+        location: j ? new Burner.Vector() : new Burner.Vector(world.width / 2 + getRandomNumber(-50, 50),
+          world.height / 2 + getRandomNumber(-50, 50)),
         seekTarget: target,
         offsetAngle: 0,
         offsetDistance: j ? (j === 1 ? wingSize / 20: -wingSize / 20) : null,
-        className: 'roll',
         pointToDirection: false,
         maxSteeringForce: 1000,
-        wrapEdges: true,
+        wrapWorldEdges: true,
         flocking: j ? false : true,
         separateStrength: 0.4,
         alignStrength: 0.1,
@@ -153,18 +144,18 @@ Flora.Burner.System.create(function() {
 
   Flora.Utils.addEvent(document, 'mousedown', function() {
     mousedown = true;
-    Flora.Burner.System.updateElementPropsByName('Agent', {
+    Burner.System.updateItemPropsByName('Agent', {
       seekTarget: {
-        location: new Flora.Vector(Flora.Burner.System.mouse.location.x, Flora.Burner.System.mouse.location.y)
+        location: new Burner.Vector(Burner.System.mouse.location.x, Burner.System.mouse.location.y)
       }
     });
   });
 
   Flora.Utils.addEvent(document, 'mousemove', function() {
     if (mousedown) {
-      Flora.Burner.System.updateElementPropsByName('Agent', {
+      Burner.System.updateItemPropsByName('Agent', {
         seekTarget: {
-          location: new Flora.Vector(Flora.Burner.System.mouse.location.x, Flora.Burner.System.mouse.location.y)
+          location: new Burner.Vector(Burner.System.mouse.location.x, Burner.System.mouse.location.y)
         }
       });
     }
@@ -172,8 +163,11 @@ Flora.Burner.System.create(function() {
 
   Flora.Utils.addEvent(document, 'mouseup', function() {
     mousedown = false;
-    Flora.Burner.System.updateElementPropsByName('Agent', {
+    Burner.System.updateItemPropsByName('Agent', {
       seekTarget: target
     });
   });
+}, {
+  gravity: new Burner.Vector(),
+  c: 0
 });
