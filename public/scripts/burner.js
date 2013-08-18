@@ -22,8 +22,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-/* Version: 2.0.0 */
-/* Build time: May 27, 2013 01:03:49 *//** @namespace */
+/* Version: 2.0.3 */
+/* Build time: June 16, 2013 07:00:55 *//** @namespace */
 var Burner = {}, exports = Burner;
 
 (function(exports) {
@@ -654,11 +654,13 @@ function Item(options) {
  * @param {Function|Object} [opt_options.location = new Vector()] location.
  * @param {number} [opt_options.maxSpeed = 10] maxSpeed.
  * @param {number} [opt_options.minSpeed = 10] minSpeed.
- * @param {number} [opt_options.angle = 10] Angle.
+ * @param {number} [opt_options.angle = 0] Angle.
  * @param {number} [opt_options.lifespan = -1] Lifespan.
  * @param {number} [opt_options.life = 0] Life.
  * @param {boolean} [opt_options.isStatic = false] If set to true, object will not move.
  * @param {boolean} [opt_options.controlCamera = false] If set to true, object controls the camera.
+ * @param {Array} [opt_options.worldBounds = [true, true, true, true]] Defines the boundaries checked
+ *    checkWorldEdges is true.
  * @param {boolean} [opt_options.checkWorldEdges = false] If set to true, system restricts object
  *    movement to world boundaries.
  * @param {boolean} [opt_options.wrapWorldEdges = false] If set to true, system checks if object
@@ -670,7 +672,7 @@ function Item(options) {
  */
 Item.prototype.reset = function(opt_options) {
 
-  var i, options = opt_options;
+  var i, options = opt_options || {};
 
   for (i in options) {
     if (options.hasOwnProperty(i)) {
@@ -678,24 +680,24 @@ Item.prototype.reset = function(opt_options) {
     }
   }
 
-  this.width = options.width || 10;
-  this.height = options.height || 10;
+  this.width = options.width === undefined ? 10 : options.width;
+  this.height = options.height === undefined ? 10 : options.height;
   this.color = options.color || [0, 0, 0];
   this.colorMode = options.colorMode || 'rgb';
   this.visibility = options.visibility || 'visible';
-  this.opacity = options.opacity || 1;
-  this.zIndex = options.zIndex || 1;
+  this.opacity = options.opacity === undefined ? 1 : options.opacity;
+  this.zIndex = options.zIndex === undefined ? 1 : options.zIndex;
   this.borderWidth = options.borderWidth || 0;
   this.borderStyle = options.borderStyle || 'none';
   this.borderColor = options.borderColor || 'transparent';
   this.borderRadius = options.borderRadius || 0;
-  this.boxShadowOffset = options.boxShadowOffset || new exports.Vector();
+  this.boxShadowOffset = options.boxShadowOffset === undefined ? new exports.Vector() : options.boxShadowOffset;
   this.boxShadowBlur = options.boxShadowBlur || 0;
   this.boxShadowSpread = options.boxShadowSpread || 0;
-  this.boxShadowColor = options.boxShadowColor || 'transparent';
+  this.boxShadowColor = options.boxShadowColor === undefined ? 'transparent' : options.boxShadowColor;
 
-  this.bounciness = options.bounciness || 0.8;
-  this.mass = options.mass || 10;
+  this.bounciness = options.bounciness === undefined ? 0.8 : options.bounciness;
+  this.mass = options.mass === undefined ? 10 : options.mass;
   this.acceleration = typeof options.acceleration === 'function' ? options.acceleration.call(this) :
       options.acceleration || new exports.Vector();
   this.velocity = typeof options.velocity === 'function' ? options.velocity.call(this) :
@@ -703,18 +705,19 @@ Item.prototype.reset = function(opt_options) {
   this.location = typeof options.location === 'function' ? options.location.call(this) :
       options.location || new exports.Vector(this.world.width / 2, this.world.height / 2);
 
-  this.maxSpeed = options.maxSpeed === 0 ? 0 : options.maxSpeed || 10;
+  this.maxSpeed = options.maxSpeed === undefined ? 10 : options.maxSpeed;
   this.minSpeed = options.minSpeed || 0;
   this.angle = options.angle || 0;
 
-  this.lifespan = options.lifespan === 0 ? 0 : options.lifespan || -1;
+  this.lifespan = options.lifespan === undefined ? -1 : options.lifespan;
   this.life = options.life || 0;
   this.isStatic = !!options.isStatic;
   this.controlCamera = !!options.controlCamera;
-  this.checkWorldEdges = options.checkWorldEdges === false ? false : true;
+  this.worldBounds = options.worldBounds || [true, true, true, true];
+  this.checkWorldEdges = options.checkWorldEdges === undefined ? true : options.checkWorldEdges;
   this.wrapWorldEdges = !!options.wrapWorldEdges;
   this.avoidWorldEdges = !!options.avoidWorldEdges;
-  this.avoidWorldEdgesStrength = options.avoidWorldEdgesStrength || 50;
+  this.avoidWorldEdgesStrength = options.avoidWorldEdgesStrength === undefined ? 50 : options.avoidWorldEdgesStrength;
 };
 
 /**
@@ -767,6 +770,7 @@ Item.prototype._checkWorldEdges = function() {
 
   var worldRight = this.world.bounds[1],
       worldBottom = this.world.bounds[2],
+      worldBounds = this.worldBounds,
       location = this.location,
       velocity = this.velocity,
       width = this.width,
@@ -804,18 +808,18 @@ Item.prototype._checkWorldEdges = function() {
     }
   } else {
 
-    if (location.x + width / 2 > worldRight) {
+    if (location.x + width / 2 > worldRight && worldBounds[1]) {
       location.x = worldRight - width / 2;
       velocity.x *= -1 * bounciness;
-    } else if (location.x < width / 2) {
+    } else if (location.x < width / 2 && worldBounds[3]) {
       location.x = width / 2;
       velocity.x *= -1 * bounciness;
     }
 
-    if (location.y + height / 2 > worldBottom) {
+    if (location.y + height / 2 > worldBottom && worldBounds[2]) {
       location.y = worldBottom - height / 2;
       velocity.y *= -1 * bounciness;
-    } else if (location.y < height / 2) {
+    } else if (location.y < height / 2 && worldBounds[0]) {
       location.y = height / 2;
       velocity.y *= -1 * bounciness;
     }
@@ -866,7 +870,7 @@ System.supportedFeatures = {
 };
 
 /**
- * Stores references to all elements in the system.
+ * Stores references to all items in the system.
  * @private
  */
 System._records = {
@@ -875,7 +879,7 @@ System._records = {
 };
 
 /**
- * Stores references to all elements in the system.
+ * Stores references to all items in the system.
  * @private
  */
 System._caches = {};
@@ -938,7 +942,7 @@ System.init = function(opt_setup, opt_worldOptions, opt_world, opt_supportedFeat
   if (this.supportedFeatures.csstransforms3d) {
     this._stylePosition = '-webkit-transform: translate3d(<x>px, <y>px, 0) rotate(<angle>deg) scale(<scale>, <scale>); -moz-transform: translate3d(<x>px, <y>px, 0) rotate(<angle>deg) scale(<scale>, <scale>); -o-transform: translate3d(<x>px, <y>px, 0) rotate(<angle>deg) scale(<scale>, <scale>); -ms-transform: translate3d(<x>px, <y>px, 0) rotate(<angle>deg) scale(<scale>, <scale>);';
   } else if (this.supportedFeatures.csstransforms) {
-    this._stylePosition = '-webkit-transform: translateX(<x>px) translateY(<y>px) rotate(<angle>deg) scale(<scale>, <scale>); -moz-transform: translateX(<x>px) translateY(<y>px) rotate(<angle>deg) scale(<scale>, <scale>); -o-transform: translateX(<x>px) translateY(<y>px) rotate(<angle>deg) scale(<scale>, <scale>); -ms-transform: translateX(<x>px) translateY(<y>px) rotate(<angle>deg) scale(<scale>, <scale>);';
+    this._stylePosition = '-webkit-transform: translate(<x>px, <y>px) rotate(<angle>deg) scale(<scale>, <scale>); -moz-transform: translate(<x>px, <y>px) rotate(<angle>deg) scale(<scale>, <scale>); -o-transform: translate(<x>px, <y>px) rotate(<angle>deg) scale(<scale>, <scale>); -ms-transform: translate(<x>px, <y>px) rotate(<angle>deg) scale(<scale>, <scale>);';
   } else {
     this._stylePosition = 'position: absolute; left: <x>px; top: <y>px;';
   }
@@ -1087,7 +1091,7 @@ System._updateCacheLookup = function(obj, val) {
 /**
  * Returns the total number of items in the system.
  *
- * @returns {number} Total number of elements.
+ * @returns {number} Total number of items.
  */
 System.count = function() {
   return this._records.list.length;
@@ -1205,6 +1209,8 @@ System._resetSystem = function(opt_noRestart) {
     world.el.removeChild(world.el.firstChild);
   }
 
+  System._caches = {};
+
   System._destroyAllItems();
 
   System._idCount = 0;
@@ -1228,10 +1234,13 @@ System._resetSystem = function(opt_noRestart) {
  */
 System._destroySystem = function() {
   this._resetSystem(true);
+  this._destroyAllWorlds();
+  this.clock = 0;
+  this._idCount = 0;
 };
 
 /**
- * Removes all elements in all worlds.
+ * Removes all items in all worlds.
  *
  * @private
  */
@@ -1247,9 +1256,27 @@ System._destroyAllItems = function() {
 };
 
 /**
- * Removes an element from a world.
+ * Removes all worlds.
  *
- * @param {Object} obj The element to remove.
+ * @private
+ */
+System._destroyAllWorlds = function() {
+
+  var i, item, items = this._records.list;
+
+  for (i = items.length - 1; i >= 0; i--) {
+    item = items[i];
+    if (item.name === 'World') {
+      item.el.parentNode.removeChild(item.el);
+      items.splice(i, 1);
+    }
+  }
+};
+
+/**
+ * Removes an item from a world.
+ *
+ * @param {Object} obj The item to remove.
  */
 System.destroyItem = function (obj) {
 
@@ -1257,7 +1284,7 @@ System.destroyItem = function (obj) {
 
   for (i = 0, max = records.length; i < max; i++) {
     if (records[i].id === obj.id) {
-      records[i].el.style.visibility = 'hidden'; // hide element
+      records[i].el.style.visibility = 'hidden'; // hide item
       records[i].el.style.top = '-5000px';
       records[i].el.style.left = '-5000px';
       records[i].world._pool[records[i].world._pool.length] = records.splice(i, 1)[0]; // move record to pool array
@@ -1268,11 +1295,11 @@ System.destroyItem = function (obj) {
 };
 
 /**
- * Returns an array of elements created from the same constructor.
+ * Returns an array of items created from the same constructor.
  *
  * @param {string} name The 'name' property.
- * @param {Array} [opt_list = this._records] An optional list of elements.
- * @returns {Array} An array of elements.
+ * @param {Array} [opt_list = this._records] An optional list of items.
+ * @returns {Array} An array of items.
  */
 System.getAllItemsByName = function(name, opt_list) {
 
@@ -1288,12 +1315,12 @@ System.getAllItemsByName = function(name, opt_list) {
 };
 
 /**
- * Returns an array of elements with an attribute that matches the
+ * Returns an array of items with an attribute that matches the
  * passed 'attr'. If 'opt_val' is passed, 'attr' must equal 'val'.
  *
  * @param {string} attr The property to match.
  * @param {*} [opt_val=] The 'attr' property must equal 'val'.
- * @returns {Array} An array of elements.
+ * @returns {Array} An array of items.
  */
 System.getAllItemsByAttribute = function(attr, opt_val) {
 
@@ -1378,7 +1405,7 @@ System.updateItem = function(item, props) {
 };
 
 /**
- * Repositions all elements relative to the window size and resets the world bounds.
+ * Repositions all items relative to the window size and resets the world bounds.
  */
 System._resize = function() {
 
@@ -1456,7 +1483,7 @@ System._addEvent = function(target, eventType, handler) {
  */
 System._recordMouseLoc = function(e) {
 
-  var touch;
+  var touch, world = this.firstWorld();
 
   this.mouse.lastLocation.x = this.mouse.location.x;
   this.mouse.lastLocation.y = this.mouse.location.y;
@@ -1465,12 +1492,17 @@ System._recordMouseLoc = function(e) {
     touch = e.changedTouches[0];
   }
 
+  /**
+   * Mapping window size to world size allows us to
+   * lead an agent around a world that's not bound
+   * to the window.
+   */
   if (e.pageX && e.pageY) {
-    this.mouse.location.x = e.pageX;
-    this.mouse.location.y = e.pageY;
+    this.mouse.location.x = this.map(e.pageX, 0, window.innerWidth, 0, world.width);
+    this.mouse.location.y = this.map(e.pageY, 0, window.innerHeight, 0, world.height);
   } else if (e.clientX && e.clientY) {
-    this.mouse.location.x = e.clientX;
-    this.mouse.location.y = e.clientY;
+    this.mouse.location.x = this.map(e.clientX, 0, window.innerWidth, 0, world.width);
+    this.mouse.location.y = this.map(e.clientY, 0, window.innerHeight, 0, world.height);
   } else if (touch) {
     this.mouse.location.x = touch.pageX;
     this.mouse.location.y = touch.pageY;
@@ -1572,15 +1604,32 @@ System._getSupportedFeatures = function() {
   if (window.Modernizr) {
     features = {
       csstransforms3d: Modernizr.csstransforms3d,
-      csstransforms: Modernizr.csstransforms
+      csstransforms: Modernizr.csstransforms,
+      touch: Modernizr.touch
     };
   } else {
     features = {
       csstransforms3d: exports.FeatureDetector.detect('csstransforms3d'),
-      csstransforms: exports.FeatureDetector.detect('csstransforms')
+      csstransforms: exports.FeatureDetector.detect('csstransforms'),
+      touch: exports.FeatureDetector.detect('touch')
     };
   }
   return features;
+};
+
+/**
+ * Re-maps a number from one range to another.
+ *
+ * @param {number} value The value to be converted.
+ * @param {number} min1 Lower bound of the value's current range.
+ * @param {number} max1 Upper bound of the value's current range.
+ * @param {number} min2 Lower bound of the value's target range.
+ * @param {number} max2 Upper bound of the value's target range.
+ * @returns {number} A number.
+ */
+System.map = function(value, min1, max1, min2, max2) { // returns a new value relative to a new range
+  var unitratio = (value - min1) / (max1 - min1);
+  return (unitratio * (max2 - min2)) + min2;
 };
 
 /**
@@ -1625,7 +1674,7 @@ System._draw = function(obj) {
  * @param {Object} props A map of object properties.
  */
 System.getCSSText = function(props) {
-  return this._stylePosition.replace('<x>', props.x).replace('<y>', props.y).replace('<angle>', props.angle).replace(/<scale>/g, props.scale) + 'width: ' +
+  return this._stylePosition.replace(/<x>/g, props.x).replace(/<y>/g, props.y).replace(/<angle>/g, props.angle).replace(/<scale>/g, props.scale) + 'width: ' +
       props.width + 'px; height: ' + props.height + 'px; background-color: ' +
       props.colorMode + '(' + props.color0 + ', ' + props.color1 + (props.colorMode === 'hsl' ? '%' : '') + ', ' + props.color2 + (props.colorMode === 'hsl' ? '%' : '') +'); border: ' +
       props.borderWidth + 'px ' + props.borderStyle + ' ' + props.colorMode + '(' + props.borderColor0 + ', ' + props.borderColor1 + (props.colorMode === 'hsl' ? '%' : '') + ', ' + props.borderColor2 + (props.colorMode === 'hsl' ? '%' : '') + '); border-radius: ' +
