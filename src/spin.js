@@ -1,4 +1,10 @@
 /*global Flora, Burner, document */
+
+var world = new Burner.World(document.body, {
+  gravity: new Burner.Vector(),
+  c: 0
+});
+
 Burner.System.init(function() {
 
   var getRandomNumber = Flora.Utils.getRandomNumber,
@@ -140,7 +146,4 @@ Burner.System.init(function() {
       seekTarget: target
     });
   });
-}, {
-  gravity: new Burner.Vector(),
-  c: 0
-});
+}, world);

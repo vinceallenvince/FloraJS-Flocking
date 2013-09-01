@@ -23,9 +23,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* Version: 1.0.1 */
-/* Build time: August 18, 2013 02:28:44 */
+/* Build time: September 1, 2013 10:24:56 */
 
 /*global Flora, Burner, document */
+var world = new Burner.World(document.body, {
+  gravity: new Burner.Vector(),
+  c: 0
+});
+
 Burner.System.init(function() {
 
   var getRandomNumber = Flora.Utils.getRandomNumber,
@@ -145,7 +150,4 @@ Burner.System.init(function() {
       seekTarget: target
     });
   });
-}, {
-  gravity: new Burner.Vector(),
-  c: 0
-});
+}, world);
